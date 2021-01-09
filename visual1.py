@@ -94,22 +94,77 @@ def update_fig(n_clicks, targets):
         df1 = df_multi_stock[df_multi_stock['company'] == target]
         x = df1.index.values
         x1 = pd.Series(x)
-        y = df1.Close.values
-        y1 = pd.Series(y)
+        y_open = df1.Open.values
+        y_close = df1.Close.values
+        y_high = df1.High.values
+        y_low = df1.Low.values
+
 
         trace_line = go.Scatter(
             x = x1,
-            y = y1,
+            y = y_close,
             name = company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0]
-
         )
+        trace_candle = go.Candlestick(
+            x=x1,
+            open=y_open,
+            high=y_high,
+            low=y_low,
+            close=y_close,
+            visible=False,
+            name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
+            showlegend=False
+            )
+        trace_bar = go.Ohlc(
+            x=x1,
+            open=y_open,
+            high=y_high,
+            low=y_low,
+            close=y_close,
+            visible=False,
+            name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
+            showlegend=False
+            )
+
         data.append(trace_line)
+        data.append(trace_candle)
+        data.append(trace_bar)
 
     data = data
 
     layout = dict(
-        title = "test1",
+        title = "Stock Market",
         height = 500,
+        updatemenus=list([
+                        dict(
+                            buttons=list([
+                                dict(
+                                    args=[{'visible' : [True, False, False]}],
+                                    label='Line',
+                                    method='update'
+                                    ),
+                                dict(
+                                    args=[{'visible' : [False, True, False]}],
+                                    label='Candle',
+                                    method='update'
+                                    ),
+                                dict(
+                                    args=[{'visible' : [False, False, True]}],
+                                    label='Ohlc',
+                                    method='update'
+                                    )
+                                ]),
+                            direction='down',
+                            pad={'r':10, 't':10},
+                            showactive=True,
+                            x=0,
+                            xanchor='left',
+                            y=1.05,
+                            yanchor='top'
+                            )
+                        ]),
+                    autosize=False,
+
         ## 기간 범위 선택
         xaxis=dict(
             rangeselector=dict(
