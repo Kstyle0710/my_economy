@@ -15,24 +15,17 @@ options = dict(loop=True, autoplay=True, rendererSettings=dict(preserveAspectRat
 
 ## 기업별 주가정보 호출 함수
 company_df = pd.read_excel("./src/KRX종목코드.xlsx", dtype=object)
-# print(company_df)
-# print(company_df.loc[company_df["회사"]=="삼성전자", ["종목코드"]].values[0][0])
 
 def stock_info(name, std):
     code = company_df.loc[company_df["회사"]==name, ["종목코드"]].values[0][0]
     result = fdr.DataReader(code, std)
     return result
 
-
-
 # create DataFrame
 
-companies = ["삼성전자", "현대차"]
+companies = company_df["회사"].to_list()
 start = "2000-01-01"
-# print(stock_info("삼성전자", "2000-01-01"))
 
-# print(company_df.loc[company_df['회사']=="삼성전자"]["종목코드"])
-# stock_list = [stock_info(company, "2000-01-01") for company in companies]
 
 stock_list = []
 for company in companies:
@@ -42,7 +35,6 @@ for company in companies:
     stock_list.append(df)
 #
 df_multi_stock = pd.concat(stock_list)
-# print(df_multi_stock)
 
 ######################################################
 
@@ -61,13 +53,18 @@ app.layout = html.Div([
             options=[
                 {'label': '삼성전자', 'value': '005930'},
                 {'label': '현대차', 'value': '005380'},
-                {'label': 'LG화학', 'value': '051910'}
+                {'label': 'LG화학', 'value': '051910'},
+                {'label': 'POSCO', 'value': '005490'},
+                {'label': '카카오', 'value': '035720'},
+                {'label': 'NAVER', 'value': '035420'},
+                {'label': '삼성바이오로직스', 'value': '207940'},
+                {'label': '셀트리온', 'value': '068270'},
+                {'label': '한국조선해양', 'value': '009540'},
+                {'label': '현대중공업지주', 'value': '267250'},
+                {'label': '코스피', 'value': 'KS11'}
             ],
             value=["005930"],  # dafault value
             multi=True,  # 복수 항목 선택 가능
-            # placeholder = "Select a Country",    # 플레이스 홀더 표시
-            # disabled = True    # 드랍다운 박스 비활성화
-            # clearable=False
         ),
         html.Button(id='submit-button', n_clicks=0, children="Submit")
     ]),
@@ -135,6 +132,7 @@ def update_fig(n_clicks, targets):
     layout = dict(
         title = "Stock Market",
         height = 500,
+        ## graph type
         updatemenus=list([
                         dict(
                             buttons=list([
@@ -199,5 +197,4 @@ def update_fig(n_clicks, targets):
     }
 
 if __name__ == '__main__':
-    app.run_server(port = 4033)
-    # app.run_server(debug=True)
+    app.run_server(debug=False)
