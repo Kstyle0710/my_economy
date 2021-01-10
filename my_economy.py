@@ -21,11 +21,10 @@ def stock_info(name, std):
     result = fdr.DataReader(code, std)
     return result
 
-# create DataFrame
+## create DataFrame
 
 companies = company_df["회사"].to_list()
 start = "2000-01-01"
-
 
 stock_list = []
 for company in companies:
@@ -61,8 +60,11 @@ app.layout = html.Div([
                 {'label': '셀트리온', 'value': '068270'},
                 {'label': '한국조선해양', 'value': '009540'},
                 {'label': '현대중공업지주', 'value': '267250'},
-                {'label': '코스피', 'value': 'KS11'}
-            ],
+                {'label': 'KOSPI', 'value': 'KS11'},
+                {'label': 'Dow Jones', 'value': 'DJI'},
+                {'label': 'Nasdaq', 'value': 'IXIC'},
+                {'label': '원달러환율', 'value': 'USD/KRW'},
+                ],
             value=["005930"],  # dafault value
             multi=True,  # 복수 항목 선택 가능
         ),
@@ -102,7 +104,8 @@ def update_fig(n_clicks, targets):
                 x=x1,
                 y=y_close,
                 yaxis="y2",
-                name="KOSPI"
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                line=dict(color='grey', width=1, dash='dot')
             )
             trace_candle = go.Candlestick(
                 x=x1,
@@ -112,7 +115,7 @@ def update_fig(n_clicks, targets):
                 close=y_close,
                 yaxis="y2",
                 visible=False,
-                name="KOSPI",
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
                 showlegend=False,
                 increasing_line_color='red', decreasing_line_color='blue'
             )
@@ -124,7 +127,74 @@ def update_fig(n_clicks, targets):
                 close=y_close,
                 yaxis="y2",
                 visible=False,
-                name="KOSPI",
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
+
+        elif target == "DJI" or target == "IXIC":
+            trace_line = go.Scatter(
+                x=x1,
+                y=y_close,
+                yaxis="y3",
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                line=dict(color='#2F4F4F', width=1, dash='dot')
+            )
+            trace_candle = go.Candlestick(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y3",
+                visible=False,
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
+            trace_bar = go.Ohlc(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y3",
+                visible=False,
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
+
+
+        elif target == "USD/KRW":
+            trace_line = go.Scatter(
+                x=x1,
+                y=y_close,
+                yaxis="y4",
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                line=dict(color='#008000', width=1, dash='dot')
+            )
+            trace_candle = go.Candlestick(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y4",
+                visible=False,
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
+            trace_bar = go.Ohlc(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y4",
+                visible=False,
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
                 showlegend=False,
                 increasing_line_color='red', decreasing_line_color='blue'
             )
@@ -136,7 +206,6 @@ def update_fig(n_clicks, targets):
                 y=y_close,
                 name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0]
             )
-
             trace_candle = go.Candlestick(
                 x=x1,
                 open=y_open,
@@ -169,10 +238,23 @@ def update_fig(n_clicks, targets):
     layout = dict(
         title = "Stock Market",
         height = 700,
-        yaxis1=dict(title='yaxis1'),
-        yaxis2=dict(title='yaxis2',
+
+
+        yaxis1=dict(title='Company Index'),
+        yaxis2=dict(title='KOSPI',
                     overlaying='y',
                     side='right',
+                    ),
+        yaxis3=dict(title='US STOCK',
+                    anchor="free",
+                    overlaying='y',
+                    side='right',
+                    position=0.1
+                    ),
+        yaxis4=dict(title='EXCHANGE RATE',
+                    overlaying='y',
+                    side='left',
+                    position=0.9,
                     ),
 
 
@@ -249,5 +331,4 @@ def update_fig(n_clicks, targets):
     }
 
 if __name__ == '__main__':
-    # app.run_server(port=4042)
     app.run_server(debug=False)
