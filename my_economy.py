@@ -44,7 +44,7 @@ app = dash.Dash(__name__)
 
 app.layout = html.Div([
     ## Lottie
-    html.Div(de.Lottie(options=options, width="30%", height="30%", url=url)),
+    html.Div(de.Lottie(options=options, width="20%", height="20%", url=url)),
 
     ## properties
     html.Div([
@@ -88,6 +88,7 @@ app.layout = html.Div([
 def update_fig(n_clicks, targets):
     data = []
     for target in targets:
+
         df1 = df_multi_stock[df_multi_stock['company'] == target]
         x = df1.index.values
         x1 = pd.Series(x)
@@ -96,32 +97,68 @@ def update_fig(n_clicks, targets):
         y_high = df1.High.values
         y_low = df1.Low.values
 
+        if target == "KS11":
+            trace_line = go.Scatter(
+                x=x1,
+                y=y_close,
+                yaxis="y2",
+                name="KOSPI"
+            )
+            trace_candle = go.Candlestick(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y2",
+                visible=False,
+                name="KOSPI",
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
+            trace_bar = go.Ohlc(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y2",
+                visible=False,
+                name="KOSPI",
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
 
-        trace_line = go.Scatter(
-            x = x1,
-            y = y_close,
-            name = company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0]
-        )
-        trace_candle = go.Candlestick(
-            x=x1,
-            open=y_open,
-            high=y_high,
-            low=y_low,
-            close=y_close,
-            visible=False,
-            name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
-            showlegend=False
+
+        else:
+            trace_line = go.Scatter(
+                x=x1,
+                y=y_close,
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0]
             )
-        trace_bar = go.Ohlc(
-            x=x1,
-            open=y_open,
-            high=y_high,
-            low=y_low,
-            close=y_close,
-            visible=False,
-            name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
-            showlegend=False
-            )
+
+            trace_candle = go.Candlestick(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                visible=False,
+                name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+                )
+            trace_bar = go.Ohlc(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                visible=False,
+                name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+                )
 
         data.append(trace_line)
         data.append(trace_candle)
@@ -131,8 +168,15 @@ def update_fig(n_clicks, targets):
 
     layout = dict(
         title = "Stock Market",
-        height = 500,
-        ## graph type
+        height = 700,
+        yaxis1=dict(title='yaxis1'),
+        yaxis2=dict(title='yaxis2',
+                    overlaying='y',
+                    side='right',
+                    ),
+
+
+        # graph type
         updatemenus=list([
                         dict(
                             buttons=list([
@@ -183,6 +227,14 @@ def update_fig(n_clicks, targets):
                          label="1y",
                          step="year",
                          stepmode="backward"),
+                    dict(count=2,
+                         label="2y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(count=3,
+                         label="3y",
+                         step="year",
+                         stepmode="backward"),
                     dict(step="all")
                 ])
             ),
@@ -197,4 +249,5 @@ def update_fig(n_clicks, targets):
     }
 
 if __name__ == '__main__':
+    # app.run_server(port=4042)
     app.run_server(debug=False)
