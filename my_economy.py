@@ -64,8 +64,12 @@ app.layout = html.Div([
                 {'label': 'Dow Jones', 'value': 'DJI'},
                 {'label': 'Nasdaq', 'value': 'IXIC'},
                 {'label': '원달러환율', 'value': 'USD/KRW'},
+                {'label': '한국국채(1년만기)', 'value': 'KR1YT=RR'},
+                {'label': '한국국채(10년만기)', 'value': 'KR10YT=RR'},
+                {'label': '미국국채(1년만기)', 'value': 'US1YT=X'},
+                {'label': '미국국채(10년만기)', 'value': 'US10YT=X'},
                 ],
-            value=["005930"],  # dafault value
+            value=["005930", "KS11"],  # dafault value
             multi=True,  # 복수 항목 선택 가능
         ),
         html.Button(id='submit-button', n_clicks=0, children="Submit")
@@ -132,7 +136,7 @@ def update_fig(n_clicks, targets):
                 increasing_line_color='red', decreasing_line_color='blue'
             )
 
-        elif target == "DJI" or target == "IXIC":
+        elif target in ["DJI", "IXIC"]:
             trace_line = go.Scatter(
                 x=x1,
                 y=y_close,
@@ -172,7 +176,7 @@ def update_fig(n_clicks, targets):
                 y=y_close,
                 yaxis="y4",
                 name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
-                line=dict(color='#008000', width=1, dash='dot')
+                line=dict(color='#00FFFF', width=1, dash='dot')
             )
             trace_candle = go.Candlestick(
                 x=x1,
@@ -193,6 +197,39 @@ def update_fig(n_clicks, targets):
                 low=y_low,
                 close=y_close,
                 yaxis="y4",
+                visible=False,
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
+
+        elif target in ["KR1YT=RR", "KR10YT=RR", "US1YT=X", "US10YT=X"]:
+            trace_line = go.Scatter(
+                x=x1,
+                y=y_close,
+                yaxis="y5",
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                line=dict(color='#C71585', width=1, dash='dot')
+            )
+            trace_candle = go.Candlestick(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y5",
+                visible=False,
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                showlegend=False,
+                increasing_line_color='red', decreasing_line_color='blue'
+            )
+            trace_bar = go.Ohlc(
+                x=x1,
+                open=y_open,
+                high=y_high,
+                low=y_low,
+                close=y_close,
+                yaxis="y5",
                 visible=False,
                 name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
                 showlegend=False,
@@ -204,7 +241,9 @@ def update_fig(n_clicks, targets):
             trace_line = go.Scatter(
                 x=x1,
                 y=y_close,
-                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0]
+                yaxis="y1",
+                name=company_df.loc[company_df["종목코드"] == target, ["회사"]].values[0][0],
+                line=dict(width=0.5)
             )
             trace_candle = go.Candlestick(
                 x=x1,
@@ -212,6 +251,7 @@ def update_fig(n_clicks, targets):
                 high=y_high,
                 low=y_low,
                 close=y_close,
+                yaxis="y1",
                 visible=False,
                 name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
                 showlegend=False,
@@ -223,6 +263,7 @@ def update_fig(n_clicks, targets):
                 high=y_high,
                 low=y_low,
                 close=y_close,
+                yaxis="y1",
                 visible=False,
                 name=company_df.loc[company_df["종목코드"]==target, ["회사"]].values[0][0],
                 showlegend=False,
@@ -255,6 +296,12 @@ def update_fig(n_clicks, targets):
                     overlaying='y',
                     side='left',
                     position=0.9,
+                    ),
+
+        yaxis5=dict(title='BOND PROFIT RATE',
+                    overlaying='y',
+                    side='left',
+                    position=0.3,
                     ),
 
 
@@ -309,12 +356,12 @@ def update_fig(n_clicks, targets):
                          label="1y",
                          step="year",
                          stepmode="backward"),
-                    dict(count=2,
-                         label="2y",
-                         step="year",
-                         stepmode="backward"),
                     dict(count=3,
                          label="3y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(count=5,
+                         label="5y",
                          step="year",
                          stepmode="backward"),
                     dict(step="all")
